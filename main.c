@@ -77,8 +77,8 @@ if(current->key== key){
     else {
         L->head = current->next;
     }
-    pthread_mutex_unlock(&L->lock);
     free(current);
+    pthread_mutex_unlock(&L->lock);
     return 0;// success
 }
 previous = current;
@@ -91,26 +91,42 @@ return-1;//failure
 void List_Print7(list_t *L){
     pthread_mutex_lock(&L->lock);
     node_t *current=L->head;
-    while(current->next != NULL){
-        printf(current->key);
-        print(" -> ");
+    while(current != NULL){
+        printf("%d", current->key);
+
             if(current->next != NULL){
-                current=current->next;
+                printf(" -> ");
             }
+        current=current->next;
     }
+    printf("\n");
 pthread_mutex_unlock(&L->lock);
 }
 
+
 // Give list to copy from and copy to
-void List_Copy7(list_t *L, list_t *New){
+void List_Copy7(list_t *from, list_t *to){
     pthread_mutex_lock(&L->lock);
-    node_t *current=L->head;
-    node_t *newCurrent=New->head;
-    while(current->next != NULL){
-        newCurrent->key=current->key;
-            if(current->next != NULL){
-                current=current->next;
-            }
+
+    node_t *current = to->head;
+    node_t *tail = NULL;
+
+    while(current != NULL){
+        node_t *new = malloc(sizeof(node_t));
+        if(new == NULL){
+         break;
+        }
+        new->key = current->key;
+        new->next = NULL;
+
+        if(tail == NULL){
+            to->head = new;
+            tail = new;
+        } else {
+            tail->next = new;
+            tail = new;
+        }
+        current = current->next;
     }
 pthread_mutex_unlock(&L->lock);
 }
@@ -190,7 +206,7 @@ use the copy of the original list to find and remove items from the first list
 */
 
 int main(void){
-Node* list7 = NULL;
+node_t* list7 = NULL;
 List_Init7(&list7);
 // List_Insert7(&list7, 5);
 
