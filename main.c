@@ -86,6 +86,13 @@ pthread_mutex_unlock(&L->lock);
 return-1;//failure
 }
 
+//29.7's methods
+
+
+
+
+
+
 //Figure 29.8: Concurrent Linked List: Rewritten
 
 void List_Init(list_t *L) {
@@ -127,4 +134,5 @@ pthread_mutex_unlock(&L->lock);
 return rv; // now both success and failure
 }
 
+//29.8's methods
 
