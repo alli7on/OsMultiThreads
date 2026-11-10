@@ -5,16 +5,16 @@
 //Figure29.7:ConcurrentLinkedList
 
 //basicnodestructure
-typedef struct__node_t{
-int key;
-struct__node_t *next;
-}node_t;
+typedef struct __node_t {
+    int key;
+    struct __node_t *next;
+} node_t;
 
 //basicliststructure(oneusedperlist)
-typedef struct__list_t{
-node_t *head;
-pthread_mutex_t lock;
-}list_t;
+typedef struct __list_t {
+    node_t *head;
+    pthread_mutex_t lock;
+} list_t;
 
 
 void List_Init7(list_t *L){
@@ -23,7 +23,7 @@ pthread_mutex_init(&L->lock,NULL);
 }
 
 
-int List_Insert7(list_t *L,intkey){
+int List_Insert7(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 node_t *new=malloc(sizeof(node_t));
 if(new==NULL){
@@ -35,17 +35,17 @@ new->key = key;
 new->next= L->head;
 L->head = new;
 pthread_mutex_unlock(&L->lock);
-return0;// success
+return 0;// success
 }
 
 
-int List_Lookup7(list_t *L,intkey){
+int List_Lookup7(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 node_t *curr=L->head;
 while(curr){
 if(curr->key== key){
 pthread_mutex_unlock(&L->lock);
-return0;// success
+return 0;// success
 }
 curr=curr->next;
 
@@ -58,14 +58,11 @@ return-1;//failure
 /*
 List_Copy to make a copy of a list
 thread functions that will
-insert a number into a list
 sum up (add) data in a list
-make a copy of an existing list
-remove specified items from a list
 print out the contents of a list
 */
 
-int List_Remove7(list_t *List,intkey){
+int List_Remove7(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 
 node_t *previous = NULL;
@@ -78,20 +75,45 @@ if(current->key== key){
         previous->next =current->next;
     } 
     else {
-        List->head = current->next;
+        L->head = current->next;
     }
     pthread_mutex_unlock(&L->lock);
     free(current);
-    return0;// success
+    return 0;// success
 }
-previous = current
+previous = current;
 current=current->next;
 }
 pthread_mutex_unlock(&L->lock);
 return-1;//failure
 }
 
+void List_Print7(list_t *L){
+    pthread_mutex_lock(&L->lock);
+    node_t *current=L->head;
+    while(current->next != NULL){
+        printf(current->key);
+        print(" -> ");
+            if(current->next != NULL){
+                current=current->next;
+            }
+    }
+pthread_mutex_unlock(&L->lock);
+}
 
+// Give list to copy from and copy to
+void List_Copy7(list_t *L, list_t *New){
+    pthread_mutex_lock(&L->lock);
+    node_t *current=L->head;
+    node_t *newCurrent=New->head;
+    while(current->next != NULL){
+        newCurrent->key=current->key;
+            if(current->next != NULL){
+                current=current->next;
+            }
+    }
+pthread_mutex_unlock(&L->lock);
+}
 
 
 
@@ -100,55 +122,51 @@ return-1;//failure
 
 //Figure 29.8: Concurrent Linked List: Rewritten
 
-void List_Init8(list_t *L) {
-L->head = NULL;
-pthread_mutex_init(&L->lock, NULL);
-}
+// void List_Init8(list_t *L) {
+// L->head = NULL;
+// pthread_mutex_init(&L->lock, NULL);
+// }
 
-int List_Insert8(list_t *L, int key) {
-// synchronization not needed
-node_t *new = malloc(sizeof(node_t));
-if (new == NULL) {
-perror("malloc");
-return-1;
-}
+// int List_Insert8(list_t *L, int key) {
+// // synchronization not needed
+// node_t *new = malloc(sizeof(node_t));
+// if (new == NULL) {
+// perror("malloc");
+// return-1;
+// }
 
-new->key = key;
-// just lock critical section
-pthread_mutex_lock(&L->lock);
-new->next = L->head;
-L->head = new;
-pthread_mutex_unlock(&L->lock);
-return 0; // success
-}
+// new->key = key;
+// // just lock critical section
+// pthread_mutex_lock(&L->lock);
+// new->next = L->head;
+// L->head = new;
+// pthread_mutex_unlock(&L->lock);
+// return 0; // success
+// }
 
-int List_Lookup8(list_t *L, int key) {
-int rv =-1;
-pthread_mutex_lock(&L->lock);
-node_t *curr = L->head;
-while (curr) {
-if (curr->key == key) {
-rv = 0;
-break;
-}
+// int List_Lookup8(list_t *L, int key) {
+// int rv =-1;
+// pthread_mutex_lock(&L->lock);
+// node_t *curr = L->head;
+// while (curr) {
+// if (curr->key == key) {
+// rv = 0;
+// break;
+// }
 
-curr = curr->next;
-}
+// curr = curr->next;
+// }
 
-pthread_mutex_unlock(&L->lock);
-return rv; // now both success and failure
-}
+// pthread_mutex_unlock(&L->lock);
+// return rv; // now both success and failure
+// }
 
 //29.8's methods
 /*
 List_Remove to look for a particular item and remove it
 List_Copy to make a copy of a list
 thread functions that will
-
-insert a number into a list
 sum up (add) data in a list
-make a copy of an existing list
-remove specified items from a list
 print out the contents of a list
 */
 
@@ -170,14 +188,17 @@ a single thread to add all the items in a list
 4 threads working concurrently to add all the items in a list and return the sum
 use the copy of the original list to find and remove items from the first list
 */
-Node* list7 = NULL
+
+int main(void){
+Node* list7 = NULL;
 List_Init7(&list7);
-List_Insert7(&list7, 5);
+// List_Insert7(&list7, 5);
 
-List_Insert7(&list7, 9);
-List_Insert7(&list7, 1);
+// List_Insert7(&list7, 9);
+// List_Insert7(&list7, 1);
 
-print(List_Lookup7(&list7, 5));
+// print(List_Lookup7(&list7, 5));
 
-List_Remove7(&list7, 5);
-print(List_Lookup7(&list7, 5));
+// List_Remove7(&list7, 5);
+// print(List_Lookup7(&list7, 5));
+}
