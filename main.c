@@ -216,6 +216,13 @@ use the copy of the original list to find and remove items from the first list
 */
 
 int main(void){
+node_t* test = NULL;   
+List_Init1(&test);
+List_Insert(&test, 5)
+List_Insert(&test, 50)
+List_Insert(&test, 500)
+List_Print(&test)
+
 node_t* list = NULL;    
 node_t* copy = NULL;
 
