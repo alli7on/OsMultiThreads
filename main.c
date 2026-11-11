@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+// Both linked list structures use the same structs
+// How the stuff provided works is a bit beyond me. It just do, Idk.
+// The only real difference I'm picking up on is the second locks less.
 //Figure29.7:ConcurrentLinkedList
 
 //basicnodestructure
@@ -17,13 +20,13 @@ typedef struct __list_t {
 } list_t;
 
 
-void List_Init7(list_t *L){
+void List_Init(list_t *L){
 L->head=NULL;
 pthread_mutex_init(&L->lock,NULL);
 }
 
 
-int List_Insert7(list_t *L,int key){
+int List_Insert(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 node_t *new=malloc(sizeof(node_t));
 if(new==NULL){
@@ -39,7 +42,7 @@ return 0;// success
 }
 
 
-int List_Lookup7(list_t *L,int key){
+int List_Lookup(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 node_t *curr=L->head;
 while(curr){
@@ -54,15 +57,60 @@ pthread_mutex_unlock(&L->lock);
 return-1;//failure
 }
 
-//29.7's methods
+
+//Figure 29.8: Concurrent Linked List: Rewritten
+
+void List_Init2(list_t *L) {
+L->head = NULL;
+pthread_mutex_init(&L->lock, NULL);
+}
+
+int List_Insert2(list_t *L, int key) {
+// synchronization not needed
+node_t *new = malloc(sizeof(node_t));
+if (new == NULL) {
+perror("malloc");
+return-1;
+}
+
+new->key = key;
+// just lock critical section
+pthread_mutex_lock(&L->lock);
+new->next = L->head;
+L->head = new;
+pthread_mutex_unlock(&L->lock);
+return 0; // success
+}
+
+int List_Lookup2(list_t *L, int key) {
+int rv =-1;
+pthread_mutex_lock(&L->lock);
+node_t *curr = L->head;
+while (curr) {
+if (curr->key == key) {
+rv = 0;
+break;
+}
+
+curr = curr->next;
+}
+
+pthread_mutex_unlock(&L->lock);
+return rv; // now both success and failure
+}
+
+
+//list methods
+//These methods are shared between the two different structures.
 /*
-List_Copy to make a copy of a list
+
 thread functions that will
 sum up (add) data in a list
-print out the contents of a list
+
 */
 
-int List_Remove7(list_t *L,int key){
+// Finds a value in the list and axes the thing.
+int List_Remove(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 
 node_t *previous = NULL;
@@ -88,7 +136,8 @@ pthread_mutex_unlock(&L->lock);
 return-1;//failure
 }
 
-void List_Print7(list_t *L){
+// Prints all the values in the structur in the format 1 -> 2 -> 3.
+void List_Print(list_t *L){
     pthread_mutex_lock(&L->lock);
     node_t *current=L->head;
     while(current != NULL){
@@ -104,8 +153,8 @@ pthread_mutex_unlock(&L->lock);
 }
 
 
-// Give list to copy from and copy to
-void List_Copy7(list_t *from, list_t *to){
+// Give list to copy from and copy to. They must be initialized by hand with the method.
+void List_Copy(list_t *from, list_t *to){
     pthread_mutex_lock(&L->lock);
 
     node_t *current = to->head;
@@ -132,70 +181,12 @@ pthread_mutex_unlock(&L->lock);
 }
 
 
-
-
-
-
-//Figure 29.8: Concurrent Linked List: Rewritten
-
-// void List_Init8(list_t *L) {
-// L->head = NULL;
-// pthread_mutex_init(&L->lock, NULL);
-// }
-
-// int List_Insert8(list_t *L, int key) {
-// // synchronization not needed
-// node_t *new = malloc(sizeof(node_t));
-// if (new == NULL) {
-// perror("malloc");
-// return-1;
-// }
-
-// new->key = key;
-// // just lock critical section
-// pthread_mutex_lock(&L->lock);
-// new->next = L->head;
-// L->head = new;
-// pthread_mutex_unlock(&L->lock);
-// return 0; // success
-// }
-
-// int List_Lookup8(list_t *L, int key) {
-// int rv =-1;
-// pthread_mutex_lock(&L->lock);
-// node_t *curr = L->head;
-// while (curr) {
-// if (curr->key == key) {
-// rv = 0;
-// break;
-// }
-
-// curr = curr->next;
-// }
-
-// pthread_mutex_unlock(&L->lock);
-// return rv; // now both success and failure
-// }
-
-//29.8's methods
-/*
-List_Remove to look for a particular item and remove it
-List_Copy to make a copy of a list
-thread functions that will
-sum up (add) data in a list
-print out the contents of a list
-*/
-
-
-
-
-
-
 // main section methods
 
 /*
 a C main function that is capable of creating threads that can insert, copy, remove, and print lists
 the main function should be able to:
+
 insert a large number (e.g. a million to a billion) random integer values into a list
 make a second copy of the finished list
 sum up all the items in the list - use the gettimeofday() Linux system function to measure time needed to compute the sum - with
