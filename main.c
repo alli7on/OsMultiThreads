@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
+
+
 
 // Both linked list structures use the same structs
 // How the stuff provided works is a bit beyond me. It just do, Idk.
@@ -182,6 +185,22 @@ pthread_mutex_unlock(&L->lock);
 
 
 // main section methods
+// Calls insert the number of times requested putting random ints in. Also give it the list to insert to. 
+// For the test we are timing how long it takes to sum the values. This makes no sense. The structure is only different with reguards to lookup and insertion. 
+// There will be no difference unless I delibratly have them use different suming methods. Because suming involves no insertion and lookup. The lists are identical
+// and I'm not gonna sum differently. This question is pointless?
+
+int insertmany (list_t *L ,int many){
+    for (int i = 0; i < many - 1; i++){
+        int code = List_Insert(list_t *L, (rand() % 100));
+            if(code != 0){
+                printf("Many insert Fail")
+            }
+    }
+}
+
+
+
 
 /*
 a C main function that is capable of creating threads that can insert, copy, remove, and print lists
@@ -197,15 +216,15 @@ use the copy of the original list to find and remove items from the first list
 */
 
 int main(void){
-node_t* list7 = NULL;
-List_Init7(&list7);
-// List_Insert7(&list7, 5);
+node_t* list = NULL;    
+node_t* copy = NULL;
 
-// List_Insert7(&list7, 9);
-// List_Insert7(&list7, 1);
+List_Init1(&list);
+List_Init2(&copy);
 
-// print(List_Lookup7(&list7, 5));
+insertmany(&list, 10)
+List_Print(&list)
+List_Copy(&list, &copy)
+List_Print(&copy)
 
-// List_Remove7(&list7, 5);
-// print(List_Lookup7(&list7, 5));
 }
