@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <time.h>
-
-
+#include <time.h> 
 
 // Both linked list structures use the same structs
 // How the stuff provided works is a bit beyond me. It just do, Idk.
@@ -49,7 +47,7 @@ int List_Lookup(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 node_t *curr=L->head;
 while(curr){
-if(curr->key== key){
+if(curr->key == key){
 pthread_mutex_unlock(&L->lock);
 return 0;// success
 }
@@ -121,7 +119,7 @@ node_t *current=L->head;
 
 while(current){
 
-if(current->key== key){
+if(current->key == key){
     if (previous != NULL){
         previous->next =current->next;
     } 
@@ -158,9 +156,9 @@ pthread_mutex_unlock(&L->lock);
 
 // Give list to copy from and copy to. They must be initialized by hand with the method.
 void List_Copy(list_t *from, list_t *to){
-    pthread_mutex_lock(&L->lock);
+    pthread_mutex_lock(&from->lock);
 
-    node_t *current = to->head;
+    node_t *current = from->head;
     node_t *tail = NULL;
 
     while(current != NULL){
@@ -180,7 +178,7 @@ void List_Copy(list_t *from, list_t *to){
         }
         current = current->next;
     }
-pthread_mutex_unlock(&L->lock);
+pthread_mutex_unlock(&from->lock);
 }
 
 
@@ -190,14 +188,74 @@ pthread_mutex_unlock(&L->lock);
 // There will be no difference unless I delibratly have them use different suming methods. Because suming involves no insertion and lookup. The lists are identical
 // and I'm not gonna sum differently. This question is pointless?
 
-int insertmany (list_t *L ,int many){
-    for (int i = 0; i < many - 1; i++){
-        int code = List_Insert(list_t *L, (rand() % 100));
+void insertmany (list_t *L ,int many){
+    for (int i = 0; i < many; i++){
+        int code = List_Insert(L, rand() % 100);
             if(code != 0){
-                printf("Many insert Fail")
+                printf("Many insert Fail");
             }
     }
 }
+
+okay I need to split the list into pieces and have each thread call this with their section before returning and suming their values.
+
+int sumleapfrog(list_t *L, int leap, int offset){
+
+    int total = 0;
+    node_t *current =L->head;
+
+    for(int i = 0; i < offset && current != NULL; i++){
+        current =current->next;
+    }
+
+    if (current == NULL){
+        pthread_mutex_unlock(&L->lock);
+        return 0;
+    }
+    total = current->key;
+
+
+    while (current != NULL){
+        for(int i = 0; i < leap && current != NULL; i++){
+        current = current->next;
+        }
+
+        if(current != NULL){
+        total = total + current->key;
+        }
+    }
+    return total;
+
+}
+
+thpedef struct __info {
+    list_t *list;
+    int leap;
+    int offset;
+    long indvsum;
+} info_t
+
+void *pthreadtrick (void *infos){
+    info_t *infos = (info_t)infos;
+
+    infos->indvsum = sumleapfrog(infos->list, infos->leap, infos->offset);
+    return NULL;
+}
+
+void setup(list_t *L, int numofthreads){
+    pthread_t threads[numofthreads];
+    info_t infos[numofthreads];
+
+    for (int i = 0; i < numofthreads; i++){
+        infos[i]->list = L;
+        infos[i]->leap = numofthreads;
+        infos[i]->offset = i;
+        infos[i]->indvsum = 0;
+
+        pthread_create(&threads[i], NULL, ,&infos[i])
+    }
+}
+
 
 
 
@@ -216,22 +274,23 @@ use the copy of the original list to find and remove items from the first list
 */
 
 int main(void){
-node_t* test = NULL;   
-List_Init1(&test);
-List_Insert(&test, 5)
-List_Insert(&test, 50)
-List_Insert(&test, 500)
-List_Print(&test)
+// list_t* test = NULL;   
+// List_Init(&test);
+// List_Insert(&test, 5);
+// List_Insert(&test, 50);
+// List_Insert(&test, 500);
+// List_Print(&test);
 
-node_t* list = NULL;    
-node_t* copy = NULL;
+// list_t* list = NULL;    
+// list_t* copy = NULL;
 
-List_Init1(&list);
-List_Init2(&copy);
+// List_Init(&list);
+// List_Init2(&copy);
 
-insertmany(&list, 10)
-List_Print(&list)
-List_Copy(&list, &copy)
-List_Print(&copy)
+// insertmany(&list, 10);
+// List_Print(&list);
+// List_Copy(&list, &copy);
+// List_Print(&copy);
+
 
 }
