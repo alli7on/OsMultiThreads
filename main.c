@@ -61,11 +61,6 @@ return-1;//failure
 
 //Figure 29.8: Concurrent Linked List: Rewritten
 
-void List_Init2(list_t *L) {
-L->head = NULL;
-pthread_mutex_init(&L->lock, NULL);
-}
-
 int List_Insert2(list_t *L, int key) {
 // synchronization not needed
 node_t *new = malloc(sizeof(node_t));
@@ -259,7 +254,7 @@ long setup(list_t *L, int numofthreads){
 
 
 int main(void){
-list_t* test;   
+list_t test;   
 List_Init(&test);
 List_Insert(&test, 5);
 List_Insert(&test, 50);
@@ -267,12 +262,12 @@ List_Insert(&test, 500);
 List_Print(&test);
 
 
-list_t* list;    
-list_t* copy;
+list_t list;    
+list_t copy;
 
-list_t* copy1;
-list_t* copy2;
-list_t* copy4;
+list_t copy1;
+list_t copy2;
+list_t copy4;
 
 
 List_Init(&list);
