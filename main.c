@@ -220,7 +220,7 @@ typedef struct __info {
 } info_t;
 
 void *pthreadtrick (void *thing){
-    info_t *infos = (info_t)thing;
+    info_t *infos = (info_t *)thing;
 
     infos->indvsum = sumleapfrog(infos->list, infos->leap, infos->offset);
     return NULL;
@@ -272,9 +272,10 @@ List_Init2(&copy);
 List_Init(&copy1);
 List_Init(&copy2);
 List_Init(&copy4);
+
 List_Copy(&list, &copy1);
 List_Copy(&list, &copy2);
-List_Copy(&list, &copy3);
+List_Copy(&list, &copy4);
 
 
 insertmany(&list, 10);
@@ -283,10 +284,10 @@ List_Copy(&list, &copy);
 List_Print(&copy);
 
 long onethread = setup(&copy1, 1);
-printf("%ld one ", onethread)
+printf("%ld one ", onethread);
 long twothread = setup(&copy2, 2);
-printf("%ld two ", twothread)
+printf("%ld two ", twothread);
 long threethread = setup(&copy4, 4);
-printf("%ld three ", threethread)
+printf("%ld three ", threethread);
 
 }
