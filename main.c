@@ -102,13 +102,6 @@ return rv; // now both success and failure
 
 
 //list methods
-//These methods are shared between the two different structures.
-/*
-
-thread functions that will
-sum up (add) data in a list
-
-*/
 
 // Finds a value in the list and axes the thing.
 int List_Remove(list_t *L,int key){
@@ -197,7 +190,6 @@ void insertmany (list_t *L ,int many){
     }
 }
 
-okay I need to split the list into pieces and have each thread call this with their section before returning and suming their values.
 
 int sumleapfrog(list_t *L, int leap, int offset){
 
@@ -205,92 +197,96 @@ int sumleapfrog(list_t *L, int leap, int offset){
     node_t *current =L->head;
 
     for(int i = 0; i < offset && current != NULL; i++){
-        current =current->next;
+        current = current->next;
     }
-
-    if (current == NULL){
-        pthread_mutex_unlock(&L->lock);
-        return 0;
-    }
-    total = current->key;
-
 
     while (current != NULL){
+        total = total + current->key;
+
         for(int i = 0; i < leap && current != NULL; i++){
         current = current->next;
         }
-
-        if(current != NULL){
-        total = total + current->key;
-        }
     }
+    
     return total;
 
 }
 
-thpedef struct __info {
+typedef struct __info {
     list_t *list;
     int leap;
     int offset;
     long indvsum;
-} info_t
+} info_t;
 
-void *pthreadtrick (void *infos){
-    info_t *infos = (info_t)infos;
+void *pthreadtrick (void *thing){
+    info_t *infos = (info_t)thing;
 
     infos->indvsum = sumleapfrog(infos->list, infos->leap, infos->offset);
     return NULL;
 }
 
-void setup(list_t *L, int numofthreads){
+long setup(list_t *L, int numofthreads){
     pthread_t threads[numofthreads];
     info_t infos[numofthreads];
 
     for (int i = 0; i < numofthreads; i++){
-        infos[i]->list = L;
-        infos[i]->leap = numofthreads;
-        infos[i]->offset = i;
-        infos[i]->indvsum = 0;
+        infos[i].list = L;
+        infos[i].leap = numofthreads;
+        infos[i].offset = i;
+        infos[i].indvsum = 0;
 
-        pthread_create(&threads[i], NULL, ,&infos[i])
+        pthread_create(&threads[i], NULL, pthreadtrick, &infos[i]);
     }
+
+
+    long total = 0;
+
+    for(int i = 0; i < numofthreads; i++){
+        pthread_join(threads[i], NULL);
+        total = total + infos[i].indvsum;
+    }
+
+    return total;
 }
 
 
-
-
-
-/*
-a C main function that is capable of creating threads that can insert, copy, remove, and print lists
-the main function should be able to:
-
-insert a large number (e.g. a million to a billion) random integer values into a list
-make a second copy of the finished list
-sum up all the items in the list - use the gettimeofday() Linux system function to measure time needed to compute the sum - with
-a single thread to add all the items in a list
-2 threads working concurrently and cooperatively - each thread can work on a certain range of numbers - to add all the items in a list and return the sum
-4 threads working concurrently to add all the items in a list and return the sum
-use the copy of the original list to find and remove items from the first list
-*/
-
 int main(void){
-// list_t* test = NULL;   
-// List_Init(&test);
-// List_Insert(&test, 5);
-// List_Insert(&test, 50);
-// List_Insert(&test, 500);
-// List_Print(&test);
+list_t* test;   
+List_Init(&test);
+List_Insert(&test, 5);
+List_Insert(&test, 50);
+List_Insert(&test, 500);
+List_Print(&test);
 
-// list_t* list = NULL;    
-// list_t* copy = NULL;
+list_t* list;    
+list_t* copy;
 
-// List_Init(&list);
-// List_Init2(&copy);
+list_t* copy1;
+list_t* copy2;
+list_t* copy4;
 
-// insertmany(&list, 10);
-// List_Print(&list);
-// List_Copy(&list, &copy);
-// List_Print(&copy);
+List_Init(&list);
+List_Init2(&copy);
 
+List_Init(&copy1);
+List_Init(&copy2);
+List_Init(&copy4);
+List_Copy(&list, &copy1);
+List_Copy(&list, &copy2);
+List_Copy(&list, &copy3);
+
+
+insertmany(&list, 10);
+List_Print(&list);
+List_Copy(&list, &copy);
+List_Print(&copy);
+
+long onethread = setup(&copy1, 1);
+printf("%ld one ", onethread)
+long twothread = setup(&copy2, 2);
+printf("%ld two ", twothread)
+long threethread = setup(&copy4, 4);
+printf("%ld three ", threethread)
 
 }
