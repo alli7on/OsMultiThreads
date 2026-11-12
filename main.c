@@ -254,16 +254,8 @@ long setup(list_t *L, int numofthreads){
 
 
 int main(void){
-list_t test;   
-List_Init(&test);
-List_Insert(&test, 5);
-List_Insert(&test, 50);
-List_Insert(&test, 500);
-List_Print(&test);
-
 
 list_t list;    
-list_t copy;
 
 list_t copy1;
 list_t copy2;
@@ -271,27 +263,22 @@ list_t copy4;
 
 
 List_Init(&list);
-List_Init(&copy);
-
 List_Init(&copy1);
 List_Init(&copy2);
 List_Init(&copy4);
+
+insertmany(&list, 10);
 
 List_Copy(&list, &copy1);
 List_Copy(&list, &copy2);
 List_Copy(&list, &copy4);
 
 
-insertmany(&list, 10);
-List_Print(&list);
-List_Copy(&list, &copy);
-List_Print(&copy);
-
 long onethread = setup(&copy1, 1);
-printf("%ld one ", onethread);
+printf("%ld: one thread sum", onethread);
 long twothread = setup(&copy2, 2);
-printf("%ld two ", twothread);
+printf("%ld: two thread sum ", twothread);
 long threethread = setup(&copy4, 4);
-printf("%ld three ", threethread);
+printf("%ld: three thread sum ", threethread);
 
 }
