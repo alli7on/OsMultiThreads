@@ -149,6 +149,14 @@ pthread_mutex_unlock(&L->lock);
 
 // Give list to copy from and copy to. They must be initialized by hand with the method.
 void List_Copy(list_t *from, list_t *to){
+
+    if (from == NULL){
+        return;
+    }
+        if (to == NULL){
+        return;
+    }
+
     pthread_mutex_lock(&from->lock);
 
     node_t *current = from->head;
@@ -164,11 +172,10 @@ void List_Copy(list_t *from, list_t *to){
 
         if(tail == NULL){
             to->head = new;
-            tail = new;
         } else {
             tail->next = new;
-            tail = new;
         }
+        tail = new;
         current = current->next;
     }
 pthread_mutex_unlock(&from->lock);
@@ -259,6 +266,7 @@ List_Insert(&test, 50);
 List_Insert(&test, 500);
 List_Print(&test);
 
+
 list_t* list;    
 list_t* copy;
 
@@ -266,8 +274,9 @@ list_t* copy1;
 list_t* copy2;
 list_t* copy4;
 
+
 List_Init(&list);
-List_Init2(&copy);
+List_Init(&copy);
 
 List_Init(&copy1);
 List_Init(&copy2);
