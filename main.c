@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <time.h> 
+// #include <sys/time.h> 
+// #include <unistd.h>   
 
 // Both linked list structures use the same structs
 // How the stuff provided works is a bit beyond me. It just do, Idk.
@@ -252,7 +254,6 @@ long setup(list_t *L, int numofthreads){
     return total;
 }
 
-
 int main(void){
 
 list_t list;    
@@ -269,16 +270,40 @@ List_Init(&copy4);
 
 insertmany(&list, 10);
 
+List_Print(&list);
+
 List_Copy(&list, &copy1);
 List_Copy(&list, &copy2);
 List_Copy(&list, &copy4);
 
+// Thanks R.. GitHub STOP HELPING ICE. Bruh has answered 3,379 questions on stack overflow for 14+ years.
+// I yoinked his time calcs.
+// Source - https://stackoverflow.com/a/5362664
+// Posted by R.. GitHub STOP HELPING ICE
+// Retrieved 2026-11-12, License - CC BY-SA 2.
 
+struct time t0, t1;
+long elapsed = 0;
+
+gettimeofday(&t0, 0);
 long onethread = setup(&copy1, 1);
-printf("%ld: one thread sum", onethread);
+printf("sum using one thread: %ld \n", onethread);
+gettimeofday(&t1, 0);
+elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
+printf("It took one thread: %ld Milliseconds to sum up the linked list", elapsed);
+
+gettimeofday(&t0, 0);
 long twothread = setup(&copy2, 2);
-printf("%ld: two thread sum ", twothread);
+printf("sum using two threads: %ld \n", twothread);
+gettimeofday(&t1, 0);
+elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
+printf("It took three threads: %ld Milliseconds to sum up the linked list", elapsed);
+
+gettimeofday(&t0, 0);
 long threethread = setup(&copy4, 4);
-printf("%ld: three thread sum ", threethread);
+printf("sum using four threads: %ld \n", threethread);
+gettimeofday(&t1, 0);
+elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
+printf("It took four threads: %ld Milliseconds to sum up the linked list", elapsed);
 
 }
