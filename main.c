@@ -293,7 +293,7 @@ struct timeval t0, t1;
 long long elapsed = 0;
 
 printf("-------- Actual sum --------\n");
-int safe = safesum(&list);
+int safe = safesum(&copy1);
 printf("sum: %d \n", safe);
 printf("-------- Actual end --------\n");
 
