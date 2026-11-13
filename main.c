@@ -285,9 +285,9 @@ List_Init(&copy1);
 List_Init(&copy2);
 List_Init(&copy4);
 
-insertmany(&list, 1000);
+insertmany(&list, 1000000000);
 
-List_Print(&list);
+// List_Print(&list);
 
 List_Copy(&list, &copy1);
 List_Copy(&list, &copy2);
