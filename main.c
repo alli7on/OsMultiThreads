@@ -32,6 +32,7 @@ pthread_mutex_init(&L->lock,NULL);
 int List_Insert(list_t *L,int key){
 pthread_mutex_lock(&L->lock);
 node_t *new=malloc(sizeof(node_t));
+
 if(new==NULL){
 perror("malloc");
 pthread_mutex_unlock(&L->lock);
@@ -262,7 +263,9 @@ int safesum(list_t *L){
 
     while (current != NULL){
         total = total + current->key;
-        current = current->next;
+        if(current != NULL){
+            current = current->next;
+        }
     }
     
     pthread_mutex_unlock(&L->lock);
@@ -273,16 +276,12 @@ int safesum(list_t *L){
 
 int main(void){
 
-list_t list;    
 list_t copy1;
 
-List_Init(&list);
 List_Init(&copy1);
 
-insertmany(&list, 1000);
+insertmany(&copy1, 10000000);
 // insertmany(&list, 1000000000);
-
-List_Copy(&list, &copy1);
 
 // Thanks R.. GitHub STOP HELPING ICE. Bruh has answered 3,379 questions on stack overflow for 14+ years.
 // I yoinked his time calcs. Also crazy name.
