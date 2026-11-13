@@ -274,24 +274,14 @@ int safesum(list_t *L){
 int main(void){
 
 list_t list;    
-
 list_t copy1;
-list_t copy2;
-list_t copy4;
-
 
 List_Init(&list);
 List_Init(&copy1);
-List_Init(&copy2);
-List_Init(&copy4);
 
 insertmany(&list, 1000000000);
 
-// List_Print(&list);
-
 List_Copy(&list, &copy1);
-List_Copy(&list, &copy2);
-List_Copy(&list, &copy4);
 
 // Thanks R.. GitHub STOP HELPING ICE. Bruh has answered 3,379 questions on stack overflow for 14+ years.
 // I yoinked his time calcs. Also crazy name.
@@ -324,7 +314,7 @@ printf("\n");
 
 printf("-------- two threads --------\n");
 gettimeofday(&t0, 0);
-long twothread = setup(&copy2, 2);
+long twothread = setup(&copy1, 2);
 printf("sum: %ld \n", twothread);
 gettimeofday(&t1, 0);
 elapsed = ((t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec) / 1000;
@@ -336,7 +326,7 @@ printf("\n");
 
 printf("-------- four threads --------\n");
 gettimeofday(&t0, 0);
-long threethread = setup(&copy4, 4);
+long threethread = setup(&copy1, 4);
 printf("sum: %ld \n", threethread);
 gettimeofday(&t1, 0);
 elapsed = ((t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec) / 1000;
