@@ -254,6 +254,23 @@ long setup(list_t *L, int numofthreads){
     return total;
 }
 
+int safesum(list_t *L){
+    pthread_mutex_lock(&L->lock);
+
+    int total = 0;
+    node_t *current =L->head;
+
+    while (current != NULL){
+        total = total + current->key;
+        current = current->next;
+    }
+    
+    pthread_mutex_unlock(&L->lock);
+    return total;
+
+}
+
+
 int main(void){
 
 list_t list;    
@@ -268,7 +285,7 @@ List_Init(&copy1);
 List_Init(&copy2);
 List_Init(&copy4);
 
-insertmany(&list, 10);
+insertmany(&list, 1000);
 
 List_Print(&list);
 
@@ -283,27 +300,47 @@ List_Copy(&list, &copy4);
 // Retrieved 2026-11-12, License - CC BY-SA 2.
 
 struct timeval t0, t1;
-long elapsed = 0;
+long long elapsed = 0;
 
+printf("-------- Actual sum --------\n");
+int safe = safesum(&list);
+printf("sum: %ld \n", safe);
+printf("-------- Actual end --------\n");
+
+printf("\n");
+printf("\n");
+
+printf("-------- one thread --------\n");
 gettimeofday(&t0, 0);
 long onethread = setup(&copy1, 1);
-printf("sum using one thread: %ld \n", onethread);
+printf("sum: %ld \n", onethread);
 gettimeofday(&t1, 0);
-elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
-printf("It took one thread: %ld Milliseconds to sum up the linked list", elapsed);
+elapsed = ((t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec) / 1000;
+printf("It took one thread: %ld Milliseconds to sum up the linked list\n", elapsed);
+printf("-------- one end --------\n");
 
+printf("\n");
+printf("\n");
+
+printf("-------- two threads --------\n");
 gettimeofday(&t0, 0);
 long twothread = setup(&copy2, 2);
-printf("sum using two threads: %ld \n", twothread);
+printf("sum: %ld \n", twothread);
 gettimeofday(&t1, 0);
-elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
-printf("It took three threads: %ld Milliseconds to sum up the linked list", elapsed);
+elapsed = ((t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec) / 1000;
+printf("It took three threads: %ld Milliseconds to sum up the linked list\n", elapsed);
+printf("-------- two end --------\n");
 
+printf("\n");
+printf("\n");
+
+printf("-------- four threads --------\n");
 gettimeofday(&t0, 0);
 long threethread = setup(&copy4, 4);
-printf("sum using four threads: %ld \n", threethread);
+printf("sum: %ld \n", threethread);
 gettimeofday(&t1, 0);
-elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
-printf("It took four threads: %ld Milliseconds to sum up the linked list", elapsed);
+elapsed = ((t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec) / 1000;
+printf("It took four threads: %ld Milliseconds to sum up the linked list\n", elapsed);
+printf("-------- four end --------\n");
 
 }
