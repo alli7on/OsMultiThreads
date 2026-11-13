@@ -279,7 +279,8 @@ list_t copy1;
 List_Init(&list);
 List_Init(&copy1);
 
-insertmany(&list, 1000000000);
+insertmany(&list, 1000);
+// insertmany(&list, 1000000000);
 
 List_Copy(&list, &copy1);
 
