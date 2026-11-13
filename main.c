@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <time.h> 
-// #include <sys/time.h> 
-// #include <unistd.h>   
+#include <sys/time.h> 
+#include <unistd.h>   
 
 // Both linked list structures use the same structs
 // How the stuff provided works is a bit beyond me. It just do, Idk.
@@ -277,12 +277,12 @@ List_Copy(&list, &copy2);
 List_Copy(&list, &copy4);
 
 // Thanks R.. GitHub STOP HELPING ICE. Bruh has answered 3,379 questions on stack overflow for 14+ years.
-// I yoinked his time calcs.
+// I yoinked his time calcs. Also crazy name.
 // Source - https://stackoverflow.com/a/5362664
 // Posted by R.. GitHub STOP HELPING ICE
 // Retrieved 2026-11-12, License - CC BY-SA 2.
 
-struct time t0, t1;
+struct timeval t0, t1;
 long elapsed = 0;
 
 gettimeofday(&t0, 0);
